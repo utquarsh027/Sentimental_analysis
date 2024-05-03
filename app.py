@@ -1,25 +1,27 @@
 # core packages
 import streamlit as st
-from streamlit_option_menu import option_menu
+# from streamlit_option_menu import option_menu
 import pandas as pd
 import numpy as np
-
-# EDA packages
+import tensorflow as tf
+#EDA packages
 import plotly.express as pex
 
 # utils
 import joblib
 
-pipe_lr = joblib.load(open("emotion_detection_1.pkl", "rb"))
+# pipe_lr = joblib.load(open("emotion_detection_1.pkl", "rb"))
+model = tf.keras.models.model_from_json(open('model.json', 'r').read())
+model.load_weights('model_weights.h5')
 
 
 def predict_emotions(doc):
-    results = pipe_lr.predict([doc])
+    results = model.predict([doc])
     return results
 
 
 def get_prediction_proba(doc):
-    results = pipe_lr.predict_proba([doc])
+    results = model.predict_proba([doc])
     return results
 
 
@@ -57,7 +59,7 @@ def main():
 
             with col2:
                 st.success("Prediction probability")
-                proba_df = pd.DataFrame(probability, columns=pipe_lr.classes_)
+                proba_df = pd.DataFrame(probability, columns=model.classes_)
                 proba_df_clean = proba_df.T.reset_index()
                 proba_df_clean.columns = ['emotions', 'probability']
 
